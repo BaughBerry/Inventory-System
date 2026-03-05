@@ -1167,6 +1167,7 @@
             document.getElementById('costPerUnitDisplay').style.display = 'none';
             renderIngredients();
             renderDashboard();
+            saveState();
         }
 
         function handleProductSubmit(e) {
@@ -1196,6 +1197,7 @@
             e.target.reset();
             renderProducts();
             renderDashboard();
+            saveState();
         }
 
         function handleRecipeSubmit(e) {
@@ -1241,6 +1243,7 @@
             document.getElementById('recipeIngredientsContainer').innerHTML = '';
             renderRecipes();
             renderDashboard();
+            saveState();
         }
 
         function addRecipeIngredientRow() {
@@ -1676,6 +1679,7 @@
             renderDashboard();
             renderIngredients();
             renderProducts();
+            saveState();
         }
 
         function editItem(id, type) {
