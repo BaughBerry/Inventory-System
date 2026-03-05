@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Manager - Queen of Alaska</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <style>
+        :root {
+            --color-bg-primary: #f5f5f7;
+            --color-bg-secondary: #ffffff;
+            --color-bg-elevated: #ffffff;
+            --color-border: rgba(0, 0, 0, 0.1);
+            --color-border-light: rgba(0, 0, 0, 0.06);
+            --color-text-primary: #1d1d1f;
+            --color-text-secondary: #86868b;
+            --color-accent: #007aff;
+            --color-accent-hover: #0051d5;
+            --color-success: #34c759;
+            --color-warning: #ff9500;
+            --color-danger: #ff3b30;
+            --sidebar-width: 240px;
+            --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg-primary: #000000;
+                --color-bg-secondary: #1c1c1e;
+                --color-bg-elevated: #2c2c2e;
+                --color-border: rgba(255, 255, 255, 0.12);
+                --color-border-light: rgba(255, 255, 255, 0.06);
+                --color-text-primary: #f5f5f7;
+                --color-text-secondary: #98989d;
+                --color-accent: #0a84ff;
+                --color-accent-hover: #409cff;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-system);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--color-bg-secondary);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .sidebar-title {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-top: 2px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 8px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 20px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--color-text-secondary);
+            padding: 8px 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+            color: var(--color-text-primary);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: var(--color-bg-primary);
+        }
+
+        .nav-item.active {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-right: 12px;
+            width: 20px;
+        }
+
+        .nav-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            background: var(--color-bg-secondary);
+            border-bottom: 1px solid var(--color-border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toolbar-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-family: var(--font-system);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-elevated);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-primary);
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .card {
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--color-text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-family: var(--font-system);
+            font-size: 14px;
+            background: var(--color-bg-elevated);
+            color: var(--color-text-primary);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--color-text-secondary);
+            border-bottom: 1px solid var(--color-border);
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border-light);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: var(--color-bg-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(52, 199, 89, 0.15);
+            color: var(--color-success);
+        }
+
+        .badge-warning {
+            background: rgba(255, 149, 0, 0.15);
+            color: var(--color-warning);
+        }
+
+        .badge-danger {
+            background: rgba(255, 59, 48, 0.15);
+            color: var(--color-danger);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-change {
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .recipe-item {
+            background: var(--color-bg-elevated);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--color-border-light);
+        }
+
+        .recipe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .recipe-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .ingredient-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ingredient-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 40px;
+            gap: 12px;
+            padding: 8px 0;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .ingredient-name {
+            font-weight: 500;
+        }
+
+        .ingredient-amount {
+            color: var(--color-text-secondary);
+        }
+
+        .ingredient-unit {
+            color: var(--color-text-secondary);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .icon-btn:hover {
+            background: var(--color-bg-primary);
+            color: var(--color-accent);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .close-btn:hover {
+            background: var(--color-bg-primary);
+        }
+
+        .view-hidden {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .yield-adjuster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--color-bg-elevated);
+            border-radius: var(--radius-md);
+        }
+
+        .yield-label {
+            font-weight: 500;
+            margin-right: 8px;
+        }
+
+        .yield-input {
+            width: 80px;
+            padding: 6px 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .conversion-factor {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Inventory</div>
+                <div class="sidebar-subtitle">Queen of Alaska</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a class="nav-item active" data-view="dashboard">
+                        <i class="ti ti-layout-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Inventory</div>
+                    <a class="nav-item" data-view="ingredients">
+                        <i class="ti ti-plant"></i>
+                        <span>Ingredients</span>
+                    </a>
+                    <a class="nav-item" data-view="products">
+                        <i class="ti ti-box"></i>
+                        <span>Products</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Production</div>
+                    <a class="nav-item" data-view="recipes">
+                        <i class="ti ti-chef-hat"></i>
+                        <span>Recipes</span>
+                    </a>
+                    <a class="nav-item" data-view="batches">
+                        <i class="ti ti-flask"></i>
+                        <span>Batch Production</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="toolbar">
+                <div class="toolbar-title" id="pageTitle">Dashboard</div>
+                <div class="toolbar-actions">
+                    <button class="btn btn-secondary" id="exportBtn">
+                        <i class="ti ti-download"></i>
+                        Export
+                    </button>
+                    <button class="btn btn-primary" id="addBtn">
+                        <i class="ti ti-plus"></i>
+                        Add New
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div id="dashboardView">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Ingredients</div>
+                            <div class="stat-value" id="totalIngredients">0</div>
+                            <div class="stat-change">Active inventory</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Products</div>
+                            <div class="stat-value" id="totalProducts">0</div>
+                            <div class="stat-change">Ready to sell</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Recipes</div>
+                            <div class="stat-value" id="totalRecipes">0</div>
+                            <div class="stat-change">Formulations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Low Stock Items</div>
+                            <div class="stat-value" id="lowStockCount">0</div>
+                            <div class="stat-change">Need reorder</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Low Stock Alerts</div>
+                        </div>
+                        <div class="table-container">
+                            <table id="lowStockTable">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Type</th>
+                                        <th>Current Stock</th>
+                                        <th>Unit</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lowStockBody">
+                                    <tr>
+                                        <td colspan="5" class="empty-state">
+                                            <i class="ti ti-check-circle"></i>
+                                            <p>All items are well stocked</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ingredientsView" class="view-hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Ingredient Inventory</div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Quantity</th>                        <th>Unit</th>
+                        <th>Cost/Unit</th>
+                        <th>Inventory Value</th>
+                        <th>Reorder Point</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ingredientsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="productsView" class="view-hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Product Inventory</div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Jar Size</th>
+                                        <th>Quantity</th>
+                                        <th>Unit</th>
+                                        <th>Recipe</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="recipesView" class="view-hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Product Recipes</div>
+                        </div>
+                        <div id="recipesContainer"></div>
+                    </div>
+                </div>
+
+                <div id="batchesView" class="view-hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Create Production Batch</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Select Recipe</label>
+                            <select class="form-control" id="batchRecipeSelect">
+                                <option value="">Choose a recipe...</option>
+                            </select>
+                        </div>
+                        <div id="batchYieldSection" style="display: none;">
+                            <div class="yield-adjuster">
+                                <span class="yield-label">Original Yield:</span>
+                                <span id="originalYield">0</span>
+                                <span id="originalUnit">g</span>
+                                <span style="margin: 0 12px;">→</span>
+                                <span class="yield-label">New Yield:</span>
+                                <input type="number" class="yield-input" id="newYieldInput" min="1" value="0">
+                                <span id="newUnit">g</span>
+                                <span class="yield-label" style="margin-left: 16px;">Multiplier:</span>
+                                <input type="number" class="yield-input" id="conversionFactorInput" min="0.01" step="0.01" value="1.00" style="width: 70px;">
+                            </div>
+                            <div class="card">
+                                <div class="card-title" style="margin-bottom: 16px;">Scaled Ingredients</div>
+                                <div id="scaledIngredientsContainer"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Actual Amount Used (optional adjustments)</label>
+                                <div id="actualAmountsContainer"></div>
+                            </div>
+                            <button class="btn btn-primary" id="produceBatchBtn" style="width: 100%;">
+                                <i class="ti ti-check"></i>
+                                Produce Batch
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal" id="ingredientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add Ingredient</div>
+                <button class="close-btn" onclick="closeModal('ingredientModal')">
+                    <i class="ti ti-x"></i>
+                </button>
+            </div>
+            <form id="ingredientForm">
+                <input type="hidden" id="ingredientId">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" id="ingredientName" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="ingredientQuantity" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit</label>
+                        <select class="form-control" id="ingredientUnit" required>
+                            <option value="g">Grams (g)</option>
+                            <option value="kg">Kilograms (kg)</option>
+                            <option value="oz">Ounces (oz)</option>
+                            <option value="lb">Pounds (lb)</option>
+                            <option value="ml">Milliliters (ml)</option>
+                            <option value="L">Liters (L)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reorder Point</label>
+                    <input type="number" class="form-control" id="ingredientReorder" step="0.01" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Last Purchase Amount</label>
+                        <input type="number" class="form-control" id="ingredientPurchaseAmount" step="0.01" placeholder="e.g., 15">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Purchase Unit</label>
+                        <select class="form-control" id="ingredientPurchaseUnit">
+                            <option value="g">Grams (g)</option>
+                            <option value="kg">Kilograms (kg)</option>
+                            <option value="oz">Ounces (oz)</option>
+                            <option value="lb">Pounds (lb)</option>
+                            <option value="ml">Milliliters (ml)</option>
+                            <option value="L">Liters (L)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Total Purchase Cost ($)</label>
+                    <input type="number" class="form-control" id="ingredientPurchaseCost" step="0.01" placeholder="e.g., 50.00">
+                </div>
+                <div class="form-group" id="costPerUnitDisplay" style="padding: 12px; background: var(--color-bg-elevated); border-radius: 8px; display: none;">
+                    <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px;">Calculated Cost Per Unit</div>
+                    <div style="font-size: 18px; font-weight: 600; color: var(--color-accent);" id="costPerUnitValue">—</div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Ingredient</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add Product</div>
+                <button class="close-btn" onclick="closeModal('productModal')">
+                    <i class="ti ti-x"></i>
+                </button>
+            </div>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" id="productName" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Container Size</label>
+                        <input type="text" class="form-control" id="productJarSize" placeholder="e.g., 2 oz, 4 oz" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="productQuantity" step="1" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Unit Type</label>
+                    <select class="form-control" id="productUnit" required>
+                        <option value="jars">Jars</option>
+                        <option value="bottles">Bottles</option>
+                        <option value="rollers">Rollers</option>
+                        <option value="tins">Tins</option>
+                        <option value="tubes">Tubes</option>
+                        <option value="units">Units</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Product</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="recipeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add Recipe</div>
+                <button class="close-btn" onclick="closeModal('recipeModal')">
+                    <i class="ti ti-x"></i>
+                </button>
+            </div>
+            <form id="recipeForm">
+                <input type="hidden" id="recipeId">
+                <div class="form-group">
+                    <label class="form-label">Recipe Name</label>
+                    <input type="text" class="form-control" id="recipeName" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Yield Amount</label>
+                        <input type="number" class="form-control" id="recipeYield" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Yield Unit</label>
+                        <select class="form-control" id="recipeYieldUnit" required>
+                            <option value="g">Grams (g)</option>
+                            <option value="kg">Kilograms (kg)</option>
+                            <option value="oz">Ounces (oz)</option>
+                            <option value="ml">Milliliters (ml)</option>
+                            <option value="L">Liters (L)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Units Produced</label>
+                        <input type="number" class="form-control" id="recipeJarsProduced" step="1" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Output Unit Type</label>
+                        <select class="form-control" id="recipeOutputUnit" required>
+                            <option value="jars">Jars</option>
+                            <option value="bottles">Bottles</option>
+                            <option value="rollers">Rollers</option>
+                            <option value="tins">Tins</option>
+                            <option value="tubes">Tubes</option>
+                            <option value="units">Units</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ingredients</label>
+                    <div id="recipeIngredientsContainer"></div>
+                    <button type="button" class="btn btn-secondary" id="addRecipeIngredientBtn" style="width: 100%; margin-top: 8px;">
+                        <i class="ti ti-plus"></i>
+                        Add Ingredient
+                    </button>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Recipe</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            ingredients: [],
+            products: [],
+            recipes: [],
+            currentView: 'dashboard'
+        };
+
+        function init() {
+            loadSampleData();
+            setupEventListeners();
+            renderDashboard();
+        }
+
+        function loadSampleData() {
+            state.ingredients = [
+                { id: 1, name: 'Grass-Fed Tallow', quantity: 5000, unit: 'g', reorderPoint: 1000, purchaseAmount: 15, purchaseUnit: 'lb', purchaseCost: 50, costPerUnit: 0.00735 },
+                { id: 2, name: 'Beeswax', quantity: 800, unit: 'g', reorderPoint: 500, purchaseAmount: 2, purchaseUnit: 'lb', purchaseCost: 24, costPerUnit: 0.02646 },
+                { id: 3, name: 'Jojoba Oil', quantity: 300, unit: 'ml', reorderPoint: 200, purchaseAmount: 500, purchaseUnit: 'ml', purchaseCost: 18, costPerUnit: 0.036 },
+                { id: 4, name: 'Lavender Essential Oil', quantity: 50, unit: 'ml', reorderPoint: 30, purchaseAmount: 100, purchaseUnit: 'ml', purchaseCost: 32, costPerUnit: 0.32 },
+                { id: 5, name: 'Vitamin E Oil', quantity: 100, unit: 'ml', reorderPoint: 50, purchaseAmount: 250, purchaseUnit: 'ml', purchaseCost: 22, costPerUnit: 0.088 }
+            ];
+
+            state.products = [
+                { id: 1, name: 'Tallow Face Cream', jarSize: '2 oz', quantity: 24, unit: 'jars', recipeId: 1 },
+                { id: 2, name: 'Body Butter', jarSize: '4 oz', quantity: 15, unit: 'jars', recipeId: 2 }
+            ];
+
+            state.recipes = [
+                {
+                    id: 1,
+                    name: 'Tallow Face Cream',
+                    yield: 250,
+                    yieldUnit: 'g',
+                    jarsProduced: 5,
+                    outputUnit: 'jars',
+                    ingredients: [
+                        { ingredientId: 1, amount: 150, unit: 'g' },
+                        { ingredientId: 2, amount: 30, unit: 'g' },
+                        { ingredientId: 3, amount: 60, unit: 'ml' },
+                        { ingredientId: 4, amount: 5, unit: 'ml' },
+                        { ingredientId: 5, amount: 5, unit: 'ml' }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: 'Body Butter',
+                    yield: 500,
+                    yieldUnit: 'g',
+                    jarsProduced: 8,
+                    outputUnit: 'jars',
+                    ingredients: [
+                        { ingredientId: 1, amount: 400, unit: 'g' },
+                        { ingredientId: 2, amount: 50, unit: 'g' },
+                        { ingredientId: 3, amount: 40, unit: 'ml' },
+                        { ingredientId: 4, amount: 10, unit: 'ml' }
+                    ]
+                }
+            ];
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const view = item.dataset.view;
+                    switchView(view);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.delete-btn');
+                if (deleteBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const id = parseInt(deleteBtn.dataset.id);
+                    const type = deleteBtn.dataset.type;
+                    if (id && type) {
+                        deleteItem(id, type);
+                    }
+                    return;
+                }
+                
+                const editBtn = e.target.closest('.edit-btn');
+                if (editBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const id = parseInt(editBtn.dataset.id);
+                    const type = editBtn.dataset.type;
+                    if (id && type) {
+                        editItem(id, type);
+                    }
+                    return;
+                }
+            });
+
+            document.getElementById('addBtn').addEventListener('click', handleAddButton);
+            document.getElementById('ingredientForm').addEventListener('submit', handleIngredientSubmit);
+            document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
+            document.getElementById('recipeForm').addEventListener('submit', handleRecipeSubmit);
+            document.getElementById('addRecipeIngredientBtn').addEventListener('click', addRecipeIngredientRow);
+            document.getElementById('batchRecipeSelect').addEventListener('change', handleBatchRecipeChange);
+            document.getElementById('newYieldInput').addEventListener('input', handleYieldChange);
+            document.getElementById('conversionFactorInput').addEventListener('input', handleMultiplierChange);
+            document.getElementById('produceBatchBtn').addEventListener('click', handleProduceBatch);
+            
+            document.getElementById('ingredientPurchaseAmount').addEventListener('input', updateCostPerUnitPreview);
+            document.getElementById('ingredientPurchaseUnit').addEventListener('change', updateCostPerUnitPreview);
+            document.getElementById('ingredientPurchaseCost').addEventListener('input', updateCostPerUnitPreview);
+            document.getElementById('ingredientUnit').addEventListener('change', updateCostPerUnitPreview);
+        }
+
+        function switchView(view) {
+            state.currentView = view;
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+
+            document.getElementById('dashboardView').classList.add('view-hidden');
+            document.getElementById('ingredientsView').classList.add('view-hidden');
+            document.getElementById('productsView').classList.add('view-hidden');
+            document.getElementById('recipesView').classList.add('view-hidden');
+            document.getElementById('batchesView').classList.add('view-hidden');
+
+            const titles = {
+                dashboard: 'Dashboard',
+                ingredients: 'Ingredients',
+                products: 'Products',
+                recipes: 'Recipes',
+                batches: 'Batch Production'
+            };
+
+            document.getElementById('pageTitle').textContent = titles[view];
+            document.getElementById(`${view}View`).classList.remove('view-hidden');
+
+            if (view === 'dashboard') renderDashboard();
+            if (view === 'ingredients') renderIngredients();
+            if (view === 'products') renderProducts();
+            if (view === 'recipes') renderRecipes();
+            if (view === 'batches') renderBatches();
+        }
+
+        function handleAddButton() {
+            const modals = {
+                ingredients: 'ingredientModal',
+                products: 'productModal',
+                recipes: 'recipeModal'
+            };
+
+            const modalId = modals[state.currentView];
+            if (modalId) {
+                openModal(modalId);
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+            
+            if (modalId === 'ingredientModal') {
+                document.getElementById('ingredientId').value = '';
+                document.querySelector('#ingredientModal .modal-title').textContent = 'Add Ingredient';
+            } else if (modalId === 'productModal') {
+                document.getElementById('productId').value = '';
+                document.querySelector('#productModal .modal-title').textContent = 'Add Product';
+            } else if (modalId === 'recipeModal') {
+                document.getElementById('recipeId').value = '';
+                document.querySelector('#recipeModal .modal-title').textContent = 'Add Recipe';
+            }
+        }
+
+        function computeCostPerUnitFromPurchase(purchaseAmount, purchaseUnit, purchaseCost, storedUnit) {
+            if (!purchaseAmount || !purchaseCost) return null;
+            
+            const convertedAmount = convertUnit(purchaseAmount, purchaseUnit, storedUnit);
+            if (!convertedAmount || convertedAmount <= 0) return null;
+            
+            return purchaseCost / convertedAmount;
+        }
+
+        function updateCostPerUnitPreview() {
+            const purchaseAmount = parseFloat(document.getElementById('ingredientPurchaseAmount').value);
+            const purchaseUnit = document.getElementById('ingredientPurchaseUnit').value;
+            const purchaseCost = parseFloat(document.getElementById('ingredientPurchaseCost').value);
+            const storedUnit = document.getElementById('ingredientUnit').value;
+            
+            const display = document.getElementById('costPerUnitDisplay');
+            const valueEl = document.getElementById('costPerUnitValue');
+            
+            if (purchaseAmount && purchaseCost) {
+                const costPerUnit = computeCostPerUnitFromPurchase(purchaseAmount, purchaseUnit, purchaseCost, storedUnit);
+                if (costPerUnit) {
+                    display.style.display = 'block';
+                    valueEl.textContent = `$${costPerUnit.toFixed(5)} / ${storedUnit}`;
+                } else {
+                    display.style.display = 'none';
+                }
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        function handleIngredientSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('ingredientId').value;
+            
+            const purchaseAmount = parseFloat(document.getElementById('ingredientPurchaseAmount').value);
+            const purchaseUnit = document.getElementById('ingredientPurchaseUnit').value;
+            const purchaseCost = parseFloat(document.getElementById('ingredientPurchaseCost').value);
+            const unit = document.getElementById('ingredientUnit').value;
+            
+            const costPerUnit = computeCostPerUnitFromPurchase(purchaseAmount, purchaseUnit, purchaseCost, unit);
+            
+            if (id) {
+                const ingredient = state.ingredients.find(i => i.id === parseInt(id));
+                if (ingredient) {
+                    ingredient.name = document.getElementById('ingredientName').value;
+                    ingredient.quantity = parseFloat(document.getElementById('ingredientQuantity').value);
+                    ingredient.unit = unit;
+                    ingredient.reorderPoint = parseFloat(document.getElementById('ingredientReorder').value);
+                    ingredient.purchaseAmount = purchaseAmount;
+                    ingredient.purchaseUnit = purchaseUnit;
+                    ingredient.purchaseCost = purchaseCost;
+                    ingredient.costPerUnit = costPerUnit;
+                }
+            } else {
+                const ingredient = {
+                    id: Date.now(),
+                    name: document.getElementById('ingredientName').value,
+                    quantity: parseFloat(document.getElementById('ingredientQuantity').value),
+                    unit: unit,
+                    reorderPoint: parseFloat(document.getElementById('ingredientReorder').value),
+                    purchaseAmount: purchaseAmount,
+                    purchaseUnit: purchaseUnit,
+                    purchaseCost: purchaseCost,
+                    costPerUnit: costPerUnit
+                };
+                state.ingredients.push(ingredient);
+            }
+            closeModal('ingredientModal');
+            e.target.reset();
+            document.getElementById('costPerUnitDisplay').style.display = 'none';
+            renderIngredients();
+            renderDashboard();
+        }
+
+        function handleProductSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('productId').value;
+            
+            if (id) {
+                const product = state.products.find(p => p.id === parseInt(id));
+                if (product) {
+                    product.name = document.getElementById('productName').value;
+                    product.jarSize = document.getElementById('productJarSize').value;
+                    product.quantity = parseInt(document.getElementById('productQuantity').value);
+                    product.unit = document.getElementById('productUnit').value;
+                }
+            } else {
+                const product = {
+                    id: Date.now(),
+                    name: document.getElementById('productName').value,
+                    jarSize: document.getElementById('productJarSize').value,
+                    quantity: parseInt(document.getElementById('productQuantity').value),
+                    unit: document.getElementById('productUnit').value,
+                    recipeId: null
+                };
+                state.products.push(product);
+            }
+            closeModal('productModal');
+            e.target.reset();
+            renderProducts();
+            renderDashboard();
+        }
+
+        function handleRecipeSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('recipeId').value;
+            const ingredientRows = document.querySelectorAll('.recipe-ingredient-row');
+            const ingredients = [];
+            
+            ingredientRows.forEach(row => {
+                const ingredientId = parseInt(row.querySelector('.recipe-ingredient-select').value);
+                const amount = parseFloat(row.querySelector('.recipe-ingredient-amount').value);
+                const unit = row.querySelector('.recipe-ingredient-unit').value;
+                if (ingredientId && amount) {
+                    ingredients.push({ ingredientId, amount, unit });
+                }
+            });
+
+            if (id) {
+                const recipe = state.recipes.find(r => r.id === parseInt(id));
+                if (recipe) {
+                    recipe.name = document.getElementById('recipeName').value;
+                    recipe.yield = parseFloat(document.getElementById('recipeYield').value);
+                    recipe.yieldUnit = document.getElementById('recipeYieldUnit').value;
+                    recipe.jarsProduced = parseInt(document.getElementById('recipeJarsProduced').value);
+                    recipe.outputUnit = document.getElementById('recipeOutputUnit').value;
+                    recipe.ingredients = ingredients;
+                }
+            } else {
+                const recipe = {
+                    id: Date.now(),
+                    name: document.getElementById('recipeName').value,
+                    yield: parseFloat(document.getElementById('recipeYield').value),
+                    yieldUnit: document.getElementById('recipeYieldUnit').value,
+                    jarsProduced: parseInt(document.getElementById('recipeJarsProduced').value),
+                    outputUnit: document.getElementById('recipeOutputUnit').value,
+                    ingredients
+                };
+                state.recipes.push(recipe);
+            }
+            
+            closeModal('recipeModal');
+            e.target.reset();
+            document.getElementById('recipeIngredientsContainer').innerHTML = '';
+            renderRecipes();
+            renderDashboard();
+        }
+
+        function addRecipeIngredientRow() {
+            const container = document.getElementById('recipeIngredientsContainer');
+            const row = document.createElement('div');
+            row.className = 'recipe-ingredient-row';
+            row.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr 40px; gap: 8px; margin-bottom: 8px; align-items: end;';
+            
+            row.innerHTML = `
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 12px;">Ingredient</label>
+                    <select class="form-control recipe-ingredient-select" required>
+                        <option value="">Select...</option>
+                        ${state.ingredients.map(ing => `<option value="${ing.id}">${ing.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 12px;">Amount</label>
+                    <input type="number" class="form-control recipe-ingredient-amount" step="0.01" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 12px;">Unit</label>
+                    <select class="form-control recipe-ingredient-unit" required>
+                        <option value="g">g</option>
+                        <option value="kg">kg</option>
+                        <option value="oz">oz</option>
+                        <option value="lb">lb</option>
+                        <option value="ml">ml</option>
+                        <option value="L">L</option>
+                    </select>
+                </div>
+                <button type="button" class="icon-btn" onclick="this.parentElement.remove()" style="height: 38px;">
+                    <i class="ti ti-trash"></i>
+                </button>
+            `;
+            
+            container.appendChild(row);
+        }
+
+        function renderDashboard() {
+            document.getElementById('totalIngredients').textContent = state.ingredients.length;
+            document.getElementById('totalProducts').textContent = state.products.length;
+            document.getElementById('totalRecipes').textContent = state.recipes.length;
+
+            const lowStock = state.ingredients.filter(ing => ing.quantity <= ing.reorderPoint);
+            document.getElementById('lowStockCount').textContent = lowStock.length;
+
+            const tbody = document.getElementById('lowStockBody');
+            if (lowStock.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--color-text-secondary);">
+                            <i class="ti ti-check-circle" style="font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.5;"></i>
+                            All items are well stocked
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = lowStock.map(item => `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>Ingredient</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.unit}</td>
+                        <td><span class="badge badge-warning">Low Stock</span></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function renderIngredients() {
+            const tbody = document.getElementById('ingredientsBody');
+            tbody.innerHTML = state.ingredients.map(ing => {
+                const status = ing.quantity <= ing.reorderPoint ? 
+                    '<span class="badge badge-warning">Low Stock</span>' : 
+                    '<span class="badge badge-success">In Stock</span>';
+                
+                const displayQuantity = ing.quantity % 1 === 0 ? ing.quantity : parseFloat(ing.quantity).toFixed(3);
+                
+                const costPerUnitDisplay = ing.costPerUnit 
+                    ? `$${ing.costPerUnit.toFixed(5)}/${ing.unit}`
+                    : '—';
+                
+                const inventoryValue = ing.costPerUnit 
+                    ? `$${(ing.quantity * ing.costPerUnit).toFixed(2)}`
+                    : '—';
+                
+                return `
+                    <tr>
+                        <td>${ing.name}</td>
+                        <td>${displayQuantity}</td>
+                        <td>${ing.unit}</td>
+                        <td>${costPerUnitDisplay}</td>
+                        <td>${inventoryValue}</td>
+                        <td>${ing.reorderPoint}</td>
+                        <td>${status}</td>
+                        <td>
+                            <button class="icon-btn edit-btn" data-id="${ing.id}" data-type="ingredient">
+                                <i class="ti ti-edit"></i>
+                            </button>
+                            <button class="icon-btn delete-btn" data-id="${ing.id}" data-type="ingredient">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderProducts() {
+            const tbody = document.getElementById('productsBody');
+            tbody.innerHTML = state.products.map(prod => {
+                const recipe = state.recipes.find(r => r.id === prod.recipeId);
+                const recipeName = recipe ? recipe.name : 'No recipe';
+                const status = prod.quantity > 0 ? 
+                    '<span class="badge badge-success">In Stock</span>' : 
+                    '<span class="badge badge-danger">Out of Stock</span>';
+                
+                const displayQuantity = prod.quantity % 1 === 0 ? prod.quantity : parseFloat(prod.quantity).toFixed(3);
+                
+                return `
+                    <tr>
+                        <td>${prod.name}</td>
+                        <td>${prod.jarSize}</td>
+                        <td>${displayQuantity}</td>
+                        <td>${prod.unit || 'units'}</td>
+                        <td>${recipeName}</td>
+                        <td>${status}</td>
+                        <td>
+                            <button class="icon-btn edit-btn" data-id="${prod.id}" data-type="product">
+                                <i class="ti ti-edit"></i>
+                            </button>
+                            <button class="icon-btn delete-btn" data-id="${prod.id}" data-type="product">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function calculateIngredientCost(recipeIng) {
+            const ingredient = state.ingredients.find(i => i.id === recipeIng.ingredientId);
+            if (!ingredient || !ingredient.costPerUnit) return 0;
+            
+            const amountInStoredUnit = convertUnit(recipeIng.amount, recipeIng.unit, ingredient.unit);
+            return amountInStoredUnit * ingredient.costPerUnit;
+        }
+
+        function calculateRecipeCost(recipe) {
+            return recipe.ingredients.reduce((total, ing) => {
+                return total + calculateIngredientCost(ing);
+            }, 0);
+        }
+
+        function calculateCostPerUnit(recipe) {
+            const totalCost = calculateRecipeCost(recipe);
+            return recipe.jarsProduced > 0 ? totalCost / recipe.jarsProduced : 0;
+        }
+
+        function renderRecipes() {
+            const container = document.getElementById('recipesContainer');
+            if (state.recipes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="ti ti-chef-hat"></i>
+                        <p>No recipes yet</p>
+                        <button class="btn btn-primary" onclick="openModal('recipeModal')">Create First Recipe</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = state.recipes.map(recipe => {
+                const totalCost = calculateRecipeCost(recipe);
+                const costPerUnit = calculateCostPerUnit(recipe);
+                const hasCosts = recipe.ingredients.some(ing => {
+                    const ingredient = state.ingredients.find(i => i.id === ing.ingredientId);
+                    return ingredient && ingredient.costPerUnit;
+                });
+                
+                return `
+                <div class="recipe-item">
+                    <div class="recipe-header">
+                        <div class="recipe-name">${recipe.name}</div>
+                        <div>
+                            <span style="color: var(--color-text-secondary); font-size: 14px;">Yields: ${recipe.yield} ${recipe.yieldUnit} (${recipe.jarsProduced} ${recipe.outputUnit || 'units'})</span>
+                            ${hasCosts ? `<span style="color: var(--color-accent); font-size: 14px; margin-left: 12px; font-weight: 600;">Total: $${totalCost.toFixed(2)} | Per ${recipe.outputUnit ? recipe.outputUnit.slice(0, -1) : 'unit'}: $${costPerUnit.toFixed(2)}</span>` : ''}
+                            <button class="icon-btn edit-btn" data-id="${recipe.id}" data-type="recipe">
+                                <i class="ti ti-edit"></i>
+                            </button>
+                            <button class="icon-btn delete-btn" data-id="${recipe.id}" data-type="recipe">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <ul class="ingredient-list">
+                        ${recipe.ingredients.map(ing => {
+                            const ingredient = state.ingredients.find(i => i.id === ing.ingredientId);
+                            const percentage = ((ing.amount / recipe.yield) * 100).toFixed(1);
+                            const cost = calculateIngredientCost(ing);
+                            const costDisplay = ingredient && ingredient.costPerUnit ? `$${cost.toFixed(2)}` : '—';
+                            return `
+                                <li class="ingredient-item">
+                                    <span class="ingredient-name">${ingredient ? ingredient.name : 'Unknown'}</span>
+                                    <span class="ingredient-amount">${ing.amount} ${ing.unit}</span>
+                                    <span class="ingredient-unit">${percentage}%</span>
+                                    <span style="color: var(--color-accent); font-weight: 500;">${costDisplay}</span>
+                                </li>
+                            `;
+                        }).join('')}
+                    </ul>
+                </div>
+            `}).join('');
+        }
+
+        function renderBatches() {
+            const select = document.getElementById('batchRecipeSelect');
+            select.innerHTML = '<option value="">Choose a recipe...</option>' + 
+                state.recipes.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        }
+
+        function handleBatchRecipeChange(e) {
+            const recipeId = parseInt(e.target.value);
+            const section = document.getElementById('batchYieldSection');
+            
+            if (!recipeId) {
+                section.style.display = 'none';
+                return;
+            }
+
+            const recipe = state.recipes.find(r => r.id === recipeId);
+            if (!recipe) return;
+
+            section.style.display = 'block';
+            document.getElementById('originalYield').textContent = recipe.yield;
+            document.getElementById('originalUnit').textContent = recipe.yieldUnit;
+            document.getElementById('newYieldInput').value = recipe.yield;
+            document.getElementById('newUnit').textContent = recipe.yieldUnit;
+            document.getElementById('conversionFactorInput').value = '1.00';
+
+            renderScaledIngredients(recipe, 1);
+        }
+
+        function handleYieldChange() {
+            const recipeId = parseInt(document.getElementById('batchRecipeSelect').value);
+            if (!recipeId) return;
+
+            const recipe = state.recipes.find(r => r.id === recipeId);
+            const newYield = parseFloat(document.getElementById('newYieldInput').value) || recipe.yield;
+            const conversionFactor = newYield / recipe.yield;
+            
+            document.getElementById('conversionFactorInput').value = conversionFactor.toFixed(2);
+            renderScaledIngredients(recipe, conversionFactor);
+        }
+
+        function handleMultiplierChange() {
+            const recipeId = parseInt(document.getElementById('batchRecipeSelect').value);
+            if (!recipeId) return;
+
+            const recipe = state.recipes.find(r => r.id === recipeId);
+            const conversionFactor = parseFloat(document.getElementById('conversionFactorInput').value) || 1;
+            const newYield = (recipe.yield * conversionFactor).toFixed(2);
+            
+            document.getElementById('newYieldInput').value = newYield;
+            renderScaledIngredients(recipe, conversionFactor);
+        }
+
+        function renderScaledIngredients(recipe, conversionFactor) {
+            const container = document.getElementById('scaledIngredientsContainer');
+            const actualContainer = document.getElementById('actualAmountsContainer');
+            
+            let totalBatchCost = 0;
+            
+            const scaledHTML = recipe.ingredients.map(ing => {
+                const ingredient = state.ingredients.find(i => i.id === ing.ingredientId);
+                const scaledAmount = (ing.amount * conversionFactor).toFixed(2);
+                const cost = calculateIngredientCost({ ingredientId: ing.ingredientId, amount: scaledAmount, unit: ing.unit });
+                totalBatchCost += cost;
+                const costDisplay = ingredient && ingredient.costPerUnit ? `$${cost.toFixed(2)}` : '—';
+                
+                return `
+                    <div class="ingredient-item">
+                        <span class="ingredient-name">${ingredient ? ingredient.name : 'Unknown'}</span>
+                        <span class="ingredient-amount">${scaledAmount} ${ing.unit}</span>
+                        <span style="color: var(--color-accent); font-weight: 500;">${costDisplay}</span>
+                        <span></span>
+                    </div>
+                `;
+            }).join('');
+
+            const unitsProduced = Math.round(recipe.jarsProduced * conversionFactor);
+            const costPerUnit = unitsProduced > 0 ? totalBatchCost / unitsProduced : 0;
+            
+            const costSummary = totalBatchCost > 0 ? `
+                <div style="margin-top: 12px; padding: 12px; background: var(--color-bg-elevated); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px;">Batch Cost</div>
+                        <div style="font-size: 20px; font-weight: 600; color: var(--color-accent);">$${totalBatchCost.toFixed(2)}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px;">Cost Per ${recipe.outputUnit ? recipe.outputUnit.slice(0, -1) : 'Unit'}</div>
+                        <div style="font-size: 20px; font-weight: 600; color: var(--color-accent);">$${costPerUnit.toFixed(2)}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px;">Units Produced</div>
+                        <div style="font-size: 20px; font-weight: 600;">${unitsProduced}</div>
+                    </div>
+                </div>
+            ` : '';
+
+            const actualHTML = recipe.ingredients.map(ing => {
+                const ingredient = state.ingredients.find(i => i.id === ing.ingredientId);
+                const scaledAmount = (ing.amount * conversionFactor).toFixed(2);
+                
+                return `
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 8px; align-items: center;">
+                        <span style="font-size: 14px;">${ingredient ? ingredient.name : 'Unknown'}</span>
+                        <input type="number" class="form-control actual-amount" data-ingredient-id="${ing.ingredientId}" 
+                               value="${scaledAmount}" step="0.01" style="padding: 6px 10px; font-size: 14px;">
+                        <span style="color: var(--color-text-secondary); font-size: 14px;">${ing.unit}</span>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = scaledHTML + costSummary;
+            actualContainer.innerHTML = actualHTML;
+        }
+
+        function convertUnit(amount, fromUnit, toUnit) {
+            const weightConversions = {
+                'g': 1,
+                'kg': 1000,
+                'oz': 28.3495,
+                'lb': 453.592
+            };
+            
+            const volumeConversions = {
+                'ml': 1,
+                'L': 1000
+            };
+            
+            if (weightConversions[fromUnit] && weightConversions[toUnit]) {
+                const grams = amount * weightConversions[fromUnit];
+                return grams / weightConversions[toUnit];
+            }
+            
+            if (volumeConversions[fromUnit] && volumeConversions[toUnit]) {
+                const ml = amount * volumeConversions[fromUnit];
+                return ml / volumeConversions[toUnit];
+            }
+            
+            return amount;
+        }
+
+        function handleProduceBatch() {
+            const recipeId = parseInt(document.getElementById('batchRecipeSelect').value);
+            if (!recipeId) {
+                alert('Please select a recipe first.');
+                return;
+            }
+
+            const recipe = state.recipes.find(r => r.id === recipeId);
+            if (!recipe) return;
+
+            const actualInputs = document.querySelectorAll('.actual-amount');
+            
+            const insufficientIngredients = [];
+            const ingredientChecks = [];
+            
+            actualInputs.forEach(input => {
+                const ingredientId = parseInt(input.dataset.ingredientId);
+                const actualAmount = parseFloat(input.value);
+                const recipeIngredient = recipe.ingredients.find(ri => ri.ingredientId === ingredientId);
+                const ingredient = state.ingredients.find(i => i.id === ingredientId);
+                
+                if (ingredient && recipeIngredient) {
+                    const convertedAmount = convertUnit(actualAmount, recipeIngredient.unit, ingredient.unit);
+                    
+                    ingredientChecks.push({
+                        ingredient,
+                        convertedAmount
+                    });
+                    
+                    if (ingredient.quantity < convertedAmount) {
+                        insufficientIngredients.push({
+                            name: ingredient.name,
+                            needed: convertedAmount.toFixed(2),
+                            available: ingredient.quantity.toFixed(2),
+                            unit: ingredient.unit
+                        });
+                    }
+                }
+            });
+            
+            if (insufficientIngredients.length > 0) {
+                let errorMessage = 'Insufficient ingredients to produce batch:\n\n';
+                insufficientIngredients.forEach(item => {
+                    errorMessage += `${item.name}: Need ${item.needed} ${item.unit}, but only ${item.available} ${item.unit} available\n`;
+                });
+                alert(errorMessage);
+                return;
+            }
+            
+            ingredientChecks.forEach(check => {
+                check.ingredient.quantity -= check.convertedAmount;
+                if (check.ingredient.quantity < 0) check.ingredient.quantity = 0;
+            });
+
+            const conversionFactor = parseFloat(document.getElementById('conversionFactorInput').value) || 1;
+            const unitsProduced = Math.round(recipe.jarsProduced * conversionFactor);
+            const outputUnit = recipe.outputUnit || 'units';
+
+            let product = state.products.find(p => p.recipeId === recipeId);
+            if (product) {
+                product.quantity += unitsProduced;
+            } else {
+                state.products.push({
+                    id: Date.now(),
+                    name: recipe.name,
+                    jarSize: 'Standard',
+                    quantity: unitsProduced,
+                    unit: outputUnit,
+                    recipeId: recipeId
+                });
+            }
+
+            alert(`✓ Batch produced successfully!\n\n${recipe.name}\n${unitsProduced} ${outputUnit} added to inventory.\n\nIngredients deducted from inventory.`);
+            
+            document.getElementById('batchRecipeSelect').value = '';
+            document.getElementById('batchYieldSection').style.display = 'none';
+            
+            renderDashboard();
+            renderIngredients();
+            renderProducts();
+        }
+
+        function editItem(id, type) {
+            if (type === 'ingredient') {
+                const ingredient = state.ingredients.find(i => i.id === id);
+                if (!ingredient) return;
+                
+                document.getElementById('ingredientId').value = ingredient.id;
+                document.getElementById('ingredientName').value = ingredient.name;
+                document.getElementById('ingredientQuantity').value = ingredient.quantity;
+                document.getElementById('ingredientUnit').value = ingredient.unit;
+                document.getElementById('ingredientReorder').value = ingredient.reorderPoint;
+                document.getElementById('ingredientPurchaseAmount').value = ingredient.purchaseAmount || '';
+                document.getElementById('ingredientPurchaseUnit').value = ingredient.purchaseUnit || 'g';
+                document.getElementById('ingredientPurchaseCost').value = ingredient.purchaseCost || '';
+                
+                updateCostPerUnitPreview();
+                
+                document.querySelector('#ingredientModal .modal-title').textContent = 'Edit Ingredient';
+                openModal('ingredientModal');
+            } else if (type === 'product') {
+                const product = state.products.find(p => p.id === id);
+                if (!product) return;
+                
+                document.getElementById('productId').value = product.id;
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productJarSize').value = product.jarSize;
+                document.getElementById('productQuantity').value = product.quantity;
+                document.getElementById('productUnit').value = product.unit || 'jars';
+                
+                document.querySelector('#productModal .modal-title').textContent = 'Edit Product';
+                openModal('productModal');
+            } else if (type === 'recipe') {
+                const recipe = state.recipes.find(r => r.id === id);
+                if (!recipe) return;
+                
+                document.getElementById('recipeId').value = recipe.id;
+                document.getElementById('recipeName').value = recipe.name;
+                document.getElementById('recipeYield').value = recipe.yield;
+                document.getElementById('recipeYieldUnit').value = recipe.yieldUnit;
+                document.getElementById('recipeJarsProduced').value = recipe.jarsProduced;
+                document.getElementById('recipeOutputUnit').value = recipe.outputUnit || 'jars';
+                
+                const container = document.getElementById('recipeIngredientsContainer');
+                container.innerHTML = '';
+                recipe.ingredients.forEach(ing => {
+                    addRecipeIngredientRow();
+                    const rows = container.querySelectorAll('.recipe-ingredient-row');
+                    const lastRow = rows[rows.length - 1];
+                    lastRow.querySelector('.recipe-ingredient-select').value = ing.ingredientId;
+                    lastRow.querySelector('.recipe-ingredient-amount').value = ing.amount;
+                    lastRow.querySelector('.recipe-ingredient-unit').value = ing.unit;
+                });
+                
+                document.querySelector('#recipeModal .modal-title').textContent = 'Edit Recipe';
+                openModal('recipeModal');
+            }
+        }
+
+        function deleteItem(id, type) {
+            console.log('=== DELETE FUNCTION CALLED ===');
+            console.log('ID:', id, 'Type:', typeof id);
+            console.log('Type:', type);
+            console.log('Current state:', {
+                ingredients: state.ingredients.length,
+                products: state.products.length,
+                recipes: state.recipes.length
+            });
+
+            let deleted = false;
+            
+            if (type === 'ingredient') {
+                console.log('Looking for ingredient with id:', id);
+                console.log('Available ingredients:', state.ingredients.map(i => ({ id: i.id, name: i.name })));
+                const index = state.ingredients.findIndex(i => i.id === id);
+                console.log('Found at index:', index);
+                if (index > -1) {
+                    const removed = state.ingredients.splice(index, 1);
+                    console.log('Removed:', removed);
+                    deleted = true;
+                    renderIngredients();
+                    renderDashboard();
+                }
+            } else if (type === 'product') {
+                console.log('Looking for product with id:', id);
+                console.log('Available products:', state.products.map(p => ({ id: p.id, name: p.name })));
+                const index = state.products.findIndex(p => p.id === id);
+                console.log('Found at index:', index);
+                if (index > -1) {
+                    const removed = state.products.splice(index, 1);
+                    console.log('Removed:', removed);
+                    deleted = true;
+                    renderProducts();
+                    renderDashboard();
+                }
+            } else if (type === 'recipe') {
+                console.log('Looking for recipe with id:', id);
+                console.log('Available recipes:', state.recipes.map(r => ({ id: r.id, name: r.name })));
+                const index = state.recipes.findIndex(r => r.id === id);
+                console.log('Found at index:', index);
+                if (index > -1) {
+                    const removed = state.recipes.splice(index, 1);
+                    console.log('Removed:', removed);
+                    deleted = true;
+                    renderRecipes();
+                    renderDashboard();
+                }
+            }
+            
+            console.log('Delete successful:', deleted);
+            if (!deleted) {
+                console.error('Failed to delete - item not found or invalid type');
+                alert('Error: Could not delete item. Please refresh the page and try again.');
+            }
+            console.log('=== DELETE FUNCTION COMPLETE ===');
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
