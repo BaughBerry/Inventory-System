@@ -940,6 +940,17 @@
                 saveState();
             };
         });
+
+        function testLocalStorage() {
+            try {
+                localStorage.setItem('__test__', 'ok');
+                const value = localStorage.getItem('__test__');
+                alert('localStorage value: ' + value);
+                localStorage.removeItem('__test__');
+            } catch (e) {
+                alert('localStorage error: ' + e.name);
+            }
+        }   
         
         // Replace init()
         function init() {
@@ -1003,17 +1014,6 @@
                     switchView(view);
                 });
             });
-
-        function testLocalStorage() {
-            try {
-                localStorage.setItem('__test__', 'ok');
-                const value = localStorage.getItem('__test__');
-                alert('localStorage value: ' + value);
-                localStorage.removeItem('__test__');
-            } catch (e) {
-                alert('localStorage error: ' + e.name);
-            }
-        }   
 
             document.addEventListener('click', (e) => {
                 const deleteBtn = e.target.closest('.delete-btn');
