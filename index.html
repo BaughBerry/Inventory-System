@@ -567,9 +567,6 @@
                         <i class="ti ti-download"></i>
                         Export
                     </button>
-                    <button class="btn btn-secondary" onclick="testLocalStorage()">
-                        Test Storage
-                    </button>
                     <button class="btn btn-primary" id="addBtn">
                         <i class="ti ti-plus"></i>
                         Add New
@@ -940,17 +937,6 @@
                 saveState();
             };
         });
-
-        function testLocalStorage() {
-            try {
-                localStorage.setItem('__test__', 'ok');
-                const value = localStorage.getItem('__test__');
-                alert('localStorage value: ' + value);
-                localStorage.removeItem('__test__');
-            } catch (e) {
-                alert('localStorage error: ' + e.name);
-            }
-        }   
         
         // Replace init()
         function init() {
