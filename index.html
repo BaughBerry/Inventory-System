@@ -1790,6 +1790,7 @@
                     deleted = true;
                     renderIngredients();
                     renderDashboard();
+                    saveState();
                 }
             } else if (type === 'product') {
                 console.log('Looking for product with id:', id);
@@ -1802,6 +1803,7 @@
                     deleted = true;
                     renderProducts();
                     renderDashboard();
+                    saveState();
                 }
             } else if (type === 'recipe') {
                 console.log('Looking for recipe with id:', id);
@@ -1814,10 +1816,12 @@
                     deleted = true;
                     renderRecipes();
                     renderDashboard();
+                    saveState();
                 }
             }
             
             console.log('Delete successful:', deleted);
+            saveState();
             if (!deleted) {
                 console.error('Failed to delete - item not found or invalid type');
                 alert('Error: Could not delete item. Please refresh the page and try again.');
