@@ -901,16 +901,30 @@
 
         // Save state automatically
         function saveState() {
-            localStorage.setItem('queenAlaskaInventory', JSON.stringify(state));
+            try {
+                localStorage.setItem('queenAlaskaInventory', JSON.stringify(state));
+            } catch (e) {
+                console.error('Failed to save state', e);
+            }
         }
         
         // Load state on startup  
         function loadState() {
-            const saved = localStorage.getItem('queenAlaskaInventory');
-            if (saved) {
-                Object.assign(state, JSON.parse(saved));
-            } else {
-                loadSampleData();  // only on first use
+            try {
+                const saved = localStorage.getItem('queenAlaskaInventory');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // preserve current structure but overwrite arrays/props
+                    state.ingredients = parsed.ingredients || [];
+                    state.products = parsed.products || [];
+                    state.recipes = parsed.recipes || [];
+                    state.currentView = parsed.currentView || 'dashboard';
+                } else {
+                    loadSampleData();
+                }
+            } catch (e) {
+                console.error('Failed to load state', e);
+                loadSampleData();
             }
         }
         
